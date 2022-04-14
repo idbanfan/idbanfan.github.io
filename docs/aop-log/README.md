@@ -34,5 +34,4 @@ public class GetStoreAgent implements LogFunction<Integer> {
         //storeIdToAgent。。
     }
 }
-
 ```
