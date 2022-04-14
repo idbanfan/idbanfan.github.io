@@ -13,7 +13,7 @@
 
 ## 2.日志效果
 
-```shell
+```
 操作人：admin，门店ID：1 ，门店代理人：storeAgent
 ```
 

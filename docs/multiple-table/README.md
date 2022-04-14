@@ -3,7 +3,6 @@
 ## 2.引用依赖
 
 ```xml
-
 <dependency>
     <groupId>com.idaoben</groupId>
     <artifactId>multiple-table-processor-starter</artifactId>
