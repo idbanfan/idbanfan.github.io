@@ -1,8 +1,9 @@
+## 1.说明
 
-
-## 1.引用依赖
+## 2.引用依赖
 
 ```xml
+
 <dependency>
     <groupId>com.idaoben</groupId>
     <artifactId>multiple-table-processor-starter</artifactId>
@@ -10,10 +11,10 @@
 </dependency>
 ```
 
-## 2.编写配置
+## 3.编写配置
 
 ```java
-public class Test{
+public class Test {
     public static void main(String[] args) {
         YieldConfig config = YieldConfig.builder()
                 .projectPath("C:/project/e360/web")
@@ -38,9 +39,9 @@ public class Test{
 }
 ```
 
-## 3 代码生成
+## 4 代码生成
 
-### 3.1 生成的文件
+### 4.1 生成的文件
 
 ```
   ├──controller
@@ -53,9 +54,10 @@ public class Test{
     └──UserController.java
 ```
 
-### 3.2 控制器
+### 4.2 控制器
 
 ```java
+
 @RestController
 @RequestMapping("/api/user")
 public class UserController {
@@ -74,23 +76,25 @@ public class UserController {
     @PostMapping("/get")
     public Res<Object> getUser(@RequestBody @Validated QueryReq<UserQuery> command) {
         DataWithCount andCount = multipleTableService.getAndCount(command);
-        return Res.success(andCount.getData(),andCount.getCount());
+        return Res.success(andCount.getData(), andCount.getCount());
     }
 
 }
 ```
 
-### 3.2 入参
+### 4.3 入参
 
 ```java
+
 @Data
 @NoArgsConstructor
 public class UserQuery {
     private User user;
     private UserRole userRole;
     private Role role;
+
     @Data
-    public static class User   {
+    public static class User {
         private Long id;
         private ZonedDateTime createTime;
         private ZonedDateTime updateTime;
@@ -102,7 +106,7 @@ public class UserQuery {
     }
 
     @Data
-    public static class UserRole   {
+    public static class UserRole {
         private Long id;
         private ZonedDateTime createTime;
         private ZonedDateTime updateTime;
@@ -112,7 +116,7 @@ public class UserQuery {
     }
 
     @Data
-    public static class Role   {
+    public static class Role {
         private Long id;
         private ZonedDateTime createTime;
         private ZonedDateTime updateTime;
@@ -123,11 +127,12 @@ public class UserQuery {
 }
 ```
 
-
-## 4.接口使用举例
+## 5.接口使用举例
 
 例子：根据用户查出所有的用户信息
-### 4.1 入参
+
+### 5.1 入参
+
 ```json
 {
   "condition": [
@@ -153,28 +158,30 @@ public class UserQuery {
   },
   "result": {
     "user": {
-      "id": 1
+      "id": 0
     },
     "userInfo": {
-      "notes": "info3",
-      "createTime": "2022-04-11T16:27:28",
-      "updateTime": "2022-04-22T16:27:32",
-      "id": 3,
-      "userId": 1,
-      "isEnable": 1
+      "notes": "",
+      "createTime": "",
+      "updateTime": "",
+      "id": 0,
+      "userId": 0,
+      "isEnable": 0
     }
   }
 }
 ```
-### 4.2 出参
+
+### 5.2 出参
+
 ```json
 {
   "data": [
     {
       "userInfo": {
         "notes": "info3",
-        "createTime": "2022-04-11T16:27:28",
-        "updateTime": "2022-04-22T16:27:32",
+        "createTime": "2022-04-11 16:27:28",
+        "updateTime": "2022-04-22 16:27:32",
         "id": 3,
         "userId": 1,
         "isEnable": 1
@@ -186,8 +193,8 @@ public class UserQuery {
     {
       "userInfo": {
         "notes": "info1",
-        "createTime": "2022-04-11T16:27:28",
-        "updateTime": "2022-04-22T16:27:32",
+        "createTime": "2022-04-11 16:27:28",
+        "updateTime": "2022-04-22 16:27:32",
         "id": 1,
         "userId": 1,
         "isEnable": 1
@@ -217,24 +224,130 @@ public class UserQuery {
 }
 ```
 
-### 4.3 执行的SQL
+### 5.3 执行的SQL
 
 ```sql
-SELECT
-    `user`.id AS `user.id`,
-    `user_info`.id AS `userInfo.id`,
-    `user_info`.create_time AS `userInfo.createTime`,
-    `user_info`.update_time AS `userInfo.updateTime`,
-    `user_info`.is_enable AS `userInfo.isEnable`,
-    `user_info`.notes AS `userInfo.notes`,
-    `user_info`.user_id AS `userInfo.userId`
-FROM
-    `user`
-     LEFT JOIN `user_info` ON `user_info`.user_id = `user`.id
-WHERE
-    1 = 1
+SELECT `user`.id               AS `user.id`,
+       `user_info`.id          AS `userInfo.id`,
+       `user_info`.create_time AS `userInfo.createTime`,
+       `user_info`.update_time AS `userInfo.updateTime`,
+       `user_info`.is_enable   AS `userInfo.isEnable`,
+       `user_info`.notes       AS `userInfo.notes`,
+       `user_info`.user_id     AS `userInfo.userId`
+FROM `user`
+         LEFT JOIN `user_info` ON `user_info`.user_id = `user`.id
+WHERE 1 = 1
   AND `user`.is_enable = '1'
-ORDER BY
-    `user`.id ASC
+ORDER BY `user`.id ASC
 LIMIT 0,3
 ```
+
+## 6 详细说明
+
+前端控制
+
+### 6.1 查询条件，支持一对多，多对多关联查询 (自动关联)
+
+查询用户id=1的所有角色。
+
+```json
+{
+  "condition": [],
+  "page": {
+    "current": 0,
+    "size": 2,
+    "total": 0
+  },
+  "parameter": {
+    "user": {
+      "id": 1
+    }
+  },
+  "result": {
+    "role": {
+      "rolename": ""
+    },
+    "userRole": {}
+  }
+}
+```
+
+结果
+
+```json
+{
+  "data": [
+    {
+      "role": {
+        "rolename": "超级角色"
+      }
+    },
+    {
+      "role": {
+        "rolename": "角色2"
+      }
+    }
+  ],
+  "code": 200,
+  "massage": "OK",
+  "success": true,
+  "total": 3
+}
+```
+
+### 6.2 查询结果，按需返回
+
+输入result，表示需要返回那些结果。返回的结果为数组，元素结构和result一致。
+
+```json
+{
+  "result": {
+    "user": {
+      "id": 0
+    },
+    "userInfo": {
+      "notes": "",
+      "createTime": "",
+      "id": 0
+    }
+  }
+}
+```
+
+### 6.2 查询条件，支持选择查询符号和排序
+
+```json
+{
+  "condition": [
+    {
+      "field": "user.username",
+      "sign": "likeLeft"
+    },
+    {
+      "field": "user.id",
+      "order": "asc",
+      "sign": ">"
+    }
+  ]
+}
+```
+
+### 6.4 查询条件，分页
+
+```shell
+{
+  "page": {
+    "current": 0,
+    "size": 3,
+    "total": 0
+  }
+}
+```
+
+后端控制
+
+### 6.6 查询
+
+### 6.7 查询
+
+### 6.3 查询条件，支持一层嵌套

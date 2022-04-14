@@ -31,8 +31,7 @@ public class GetStoreAgent implements LogFunction<Integer> {
 
     @Override
     public String apply(Integer storeId) {
-        //storeIdToAgent
-        return "storeAgent";
+        //storeIdToAgent。。
     }
 }
 
